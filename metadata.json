@@ -1,0 +1,6 @@
+{
+  "name": "AI Future Hub",
+  "description": "Understanding AI Today. Preparing for Tomorrow. An authoritative editorial blog exploring artificial intelligence, machine learning, and the future of technology.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
