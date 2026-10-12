@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, BookOpen, Compass, Search, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Search } from 'lucide-react';
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -27,7 +27,7 @@ export const Hero: React.FC<HeroProps> = ({
       />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Kicker label - clean text with separator, no pill badge */}
+        {/* Kicker label - clean text with separator */}
         <div className="flex items-center justify-center gap-2 text-xs font-semibold tracking-widest uppercase text-indigo-400 mb-6">
           <span>Editorial Publication</span>
           <span aria-hidden="true">·</span>
@@ -56,15 +56,21 @@ export const Hero: React.FC<HeroProps> = ({
 
         {/* CTA Button and Interactive Search Bar */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
-          {/* Required Prominent "Explore Articles" button */}
-          <button
-            onClick={onExploreClick}
+          {/* Required Prominent "Explore Articles" button with descriptive anchor text */}
+          <a
+            href="/articles"
+            onClick={(e) => {
+              e.preventDefault();
+              onExploreClick();
+            }}
+            title="Explore all 10 in-depth artificial intelligence guides"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-base font-semibold text-slate-950 bg-white hover:bg-slate-100 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+            aria-label="Explore all 10 artificial intelligence research guides"
           >
             <BookOpen className="w-5 h-5 text-indigo-600" />
             <span>Explore Articles</span>
             <ArrowRight className="w-4 h-4 text-slate-700" />
-          </button>
+          </a>
 
           {/* Quick search input */}
           <div className="w-full sm:flex-1 relative">
@@ -74,12 +80,13 @@ export const Hero: React.FC<HeroProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={`Search ${totalArticles} comprehensive articles...`}
+              aria-label="Search all 10 artificial intelligence articles"
               className="w-full pl-10 pr-4 py-3.5 bg-slate-800/80 hover:bg-slate-800 focus:bg-slate-800 border border-slate-700 focus:border-indigo-400 rounded-xl text-sm text-white placeholder-slate-400 outline-none transition-colors"
             />
           </div>
         </div>
 
-        {/* Core editorial topics overview - clean typography without pill badges */}
+        {/* Core editorial topics overview */}
         <div className="mt-12 pt-8 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-400">
           <span className="text-slate-300 font-medium">Covering Key Disciplines:</span>
           <span>Everyday Applications</span>

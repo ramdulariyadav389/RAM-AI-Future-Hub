@@ -1,6 +1,6 @@
 import React from 'react';
 import { Article } from '../types';
-import { ArrowRight, Bookmark, Clock, Calendar, User } from 'lucide-react';
+import { ArrowRight, Bookmark } from 'lucide-react';
 
 interface ArticleCardProps {
   article: Article;
@@ -21,8 +21,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
         <img
           src={article.coverImage}
-          alt={article.title}
+          alt={article.imageAlt || `${article.title} - Artificial Intelligence exploration`}
           loading="lazy"
+          decoding="async"
+          width="720"
+          height="405"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
         />
         
@@ -37,8 +40,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               ? 'bg-indigo-600 text-white shadow-md'
               : 'bg-white/80 text-slate-700 hover:bg-white hover:text-indigo-600 shadow-sm'
           }`}
-          title={isBookmarked ? 'Remove from saved' : 'Save article for later'}
-          aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark article'}
+          title={isBookmarked ? `Remove ${article.title} from saved` : `Save ${article.title} for later`}
+          aria-label={isBookmarked ? `Remove bookmark for ${article.title}` : `Bookmark article: ${article.title}`}
         >
           <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
         </button>
@@ -46,7 +49,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
       {/* Card Content */}
       <div className="p-6 flex-1 flex flex-col">
-        {/* Unboxed Metadata (Zero-pill discipline: quiet inline text with typographic separators) */}
+        {/* Unboxed Metadata (Zero-pill discipline) */}
         <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-3">
           <span className="text-indigo-600 font-semibold uppercase tracking-wider text-[11px]">
             {article.category}
@@ -59,7 +62,16 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
         {/* Title */}
         <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug line-clamp-2">
-          {article.title}
+          <a
+            href={article.seo.canonicalPath}
+            onClick={(e) => {
+              e.preventDefault();
+              onReadArticle(article);
+            }}
+            className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+          >
+            {article.title}
+          </a>
         </h3>
 
         {/* Short Description */}
@@ -72,7 +84,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <div className="flex items-center gap-2.5 min-w-0">
             <img
               src={article.author.avatar}
-              alt={article.author.name}
+              alt={`Portrait of ${article.author.name}, ${article.author.role}`}
+              loading="lazy"
+              decoding="async"
+              width="28"
+              height="28"
               className="w-7 h-7 rounded-full object-cover ring-1 ring-slate-200"
             />
             <div className="min-w-0">
@@ -85,14 +101,20 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             </div>
           </div>
 
-          {/* Required "Read Article" button */}
-          <button
-            onClick={() => onReadArticle(article)}
+          {/* Descriptive Anchor Text for SEO */}
+          <a
+            href={article.seo.canonicalPath}
+            onClick={(e) => {
+              e.preventDefault();
+              onReadArticle(article);
+            }}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors group/btn py-1 px-2.5 rounded-lg hover:bg-indigo-50/80 cursor-pointer"
+            aria-label={`Read full article: ${article.title}`}
           >
             <span>Read Article</span>
+            <span className="sr-only">: {article.title}</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-          </button>
+          </a>
         </div>
       </div>
     </article>

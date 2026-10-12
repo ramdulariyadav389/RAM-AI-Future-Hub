@@ -45,8 +45,8 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Close saved articles"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            aria-label="Close saved articles reading list"
           >
             <X className="w-5 h-5" />
           </button>
@@ -81,20 +81,24 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0 pt-1">
-                  <button
-                    onClick={() => {
+                  <a
+                    href={art.seo.canonicalPath}
+                    onClick={(e) => {
+                      e.preventDefault();
                       onSelectArticle(art);
                       onClose();
                     }}
-                    className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg text-xs font-semibold"
-                    title="Read now"
+                    className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg text-xs font-semibold cursor-pointer"
+                    title={`Read article: ${art.title}`}
+                    aria-label={`Read article: ${art.title}`}
                   >
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </a>
                   <button
                     onClick={() => onToggleBookmark(art.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                    title="Remove from saved"
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    title={`Remove ${art.title} from saved`}
+                    aria-label={`Remove article from reading list: ${art.title}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -119,6 +123,7 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({
           <button
             onClick={onClose}
             className="px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
+            aria-label="Close reading list dialog"
           >
             Close
           </button>

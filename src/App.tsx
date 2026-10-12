@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActivePage, Article } from './types';
 import { ARTICLES } from './data/articles';
 import { getBookmarkedIds, toggleBookmarkId } from './utils/storage';
+import { updatePageMetadata, PAGE_SEO_CONFIG } from './utils/seo';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { FeaturedArticles } from './components/FeaturedArticles';
@@ -30,57 +31,76 @@ export default function App() {
     setBookmarkedIds(getBookmarkedIds());
   }, []);
 
-  // Handle URL hash changes for deep linking and back/forward navigation
+  // Parse path or hash to resolve active route
+  const resolveRouteFromLocation = () => {
+    if (typeof window === 'undefined') return;
+
+    // Check pathname first (HTML5 clean URL), fallback to hash
+    const pathname = window.location.pathname;
+    const hash = window.location.hash.replace('#', '');
+
+    // Check article route: /articles/:slug or #article-:slug
+    let articleSlug = '';
+    if (pathname.startsWith('/articles/')) {
+      articleSlug = pathname.replace('/articles/', '').replace(/\/$/, '');
+    } else if (hash.startsWith('article-')) {
+      articleSlug = hash.replace('article-', '');
+    }
+
+    if (articleSlug) {
+      const matched = ARTICLES.find((a) => a.slug === articleSlug);
+      if (matched) {
+        setSelectedArticle(matched);
+        setActivePage('article-detail');
+        updatePageMetadata(matched.seo, matched.faqAeo, matched.coverImage);
+        return;
+      }
+    }
+
+    // Check /articles or #articles
+    if (pathname === '/articles' || hash === 'articles') {
+      setSelectedArticle(null);
+      setActivePage('articles');
+      updatePageMetadata(PAGE_SEO_CONFIG.articles);
+      return;
+    }
+
+    // Check /about or #about
+    if (pathname === '/about' || hash === 'about') {
+      setSelectedArticle(null);
+      setActivePage('about');
+      updatePageMetadata(PAGE_SEO_CONFIG.about);
+      return;
+    }
+
+    // Check /contact or #contact
+    if (pathname === '/contact' || hash === 'contact') {
+      setSelectedArticle(null);
+      setActivePage('contact');
+      updatePageMetadata(PAGE_SEO_CONFIG.contact);
+      return;
+    }
+
+    // Default: Home
+    setSelectedArticle(null);
+    setActivePage('home');
+    updatePageMetadata(PAGE_SEO_CONFIG.home);
+  };
+
+  // Listen to popstate (browser back/forward) and hashchange
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (!hash) {
-        setSelectedArticle(null);
-        setActivePage('home');
-        return;
-      }
+    resolveRouteFromLocation();
 
-      if (hash.startsWith('article-')) {
-        const slug = hash.replace('article-', '');
-        const matched = ARTICLES.find((a) => a.slug === slug);
-        if (matched) {
-          setSelectedArticle(matched);
-          setActivePage('article-detail');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
-        }
-      }
-
-      if (hash === 'articles') {
-        setSelectedArticle(null);
-        setActivePage('articles');
-        const el = document.getElementById('articles-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return;
-      }
-
-      if (hash === 'about') {
-        setSelectedArticle(null);
-        setActivePage('about');
-        const el = document.getElementById('about-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return;
-      }
-
-      if (hash === 'contact') {
-        setSelectedArticle(null);
-        setActivePage('contact');
-        const el = document.getElementById('contact-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        return;
-      }
+    const handlePopState = () => {
+      resolveRouteFromLocation();
     };
 
-    // Check hash on mount
-    handleHashChange();
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
   }, []);
 
   // Keyboard shortcut '/' to focus search
@@ -100,27 +120,37 @@ export default function App() {
     setBookmarkedIds(updated);
   };
 
+  // Good URL routing handler: updates history.pushState with clean URL & syncs metadata
   const handleNavigate = (page: ActivePage) => {
     setActivePage(page);
     setSelectedArticle(null);
 
+    let path = '/';
+    if (page === 'articles') path = '/articles';
+    else if (page === 'about') path = '/about';
+    else if (page === 'contact') path = '/contact';
+
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+
+    if (PAGE_SEO_CONFIG[page]) {
+      updatePageMetadata(PAGE_SEO_CONFIG[page]);
+    }
+
     if (page === 'home') {
-      window.location.hash = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (page === 'articles') {
-      window.location.hash = 'articles';
       setTimeout(() => {
         const el = document.getElementById('articles-section');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 50);
     } else if (page === 'about') {
-      window.location.hash = 'about';
       setTimeout(() => {
         const el = document.getElementById('about-section');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 50);
     } else if (page === 'contact') {
-      window.location.hash = 'contact';
       setTimeout(() => {
         const el = document.getElementById('contact-section');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -128,17 +158,25 @@ export default function App() {
     }
   };
 
+  // Navigate to individual article with unique URL: /articles/:slug
   const handleSelectArticle = (article: Article) => {
     setSelectedArticle(article);
     setActivePage('article-detail');
-    window.location.hash = `article-${article.slug}`;
+
+    const path = article.seo.canonicalPath;
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+
+    updatePageMetadata(article.seo, article.faqAeo, article.coverImage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackFromDetail = () => {
     setSelectedArticle(null);
     setActivePage('articles');
-    window.location.hash = 'articles';
+    window.history.pushState(null, '', '/articles');
+    updatePageMetadata(PAGE_SEO_CONFIG.articles);
     setTimeout(() => {
       const el = document.getElementById('articles-section');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -150,7 +188,8 @@ export default function App() {
       setSelectedArticle(null);
     }
     setActivePage('articles');
-    window.location.hash = 'articles';
+    window.history.pushState(null, '', '/articles');
+    updatePageMetadata(PAGE_SEO_CONFIG.articles);
     setTimeout(() => {
       const el = document.getElementById('articles-section');
       if (el) {
@@ -180,7 +219,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1">
         {selectedArticle ? (
-          /* Individual Full Article View */
+          /* Individual Full Article View (Unique URL: /articles/:slug) */
           <ArticleDetail
             article={selectedArticle}
             onBack={handleBackFromDetail}
@@ -198,7 +237,6 @@ export default function App() {
               searchQuery={searchQuery}
               onSearchChange={(q) => {
                 setSearchQuery(q);
-                // If user starts typing in hero search, scroll to articles section
                 if (q.trim()) {
                   const el = document.getElementById('articles-section');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -207,7 +245,7 @@ export default function App() {
               totalArticles={ARTICLES.length}
             />
 
-            {/* Featured Section */}
+            {/* Featured Section: Explore the Future of AI */}
             <FeaturedArticles
               articles={ARTICLES}
               onReadArticle={handleSelectArticle}
@@ -228,7 +266,7 @@ export default function App() {
             />
 
             {/* About Section */}
-            <AboutSection />
+            <AboutSection onExploreArticles={() => handleNavigate('articles')} />
 
             {/* Contact Section */}
             <ContactSection />

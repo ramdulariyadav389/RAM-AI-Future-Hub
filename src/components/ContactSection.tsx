@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Send, CheckCircle2, AlertCircle, MessageSquare, Clock, MapPin } from 'lucide-react';
+import { Mail, Send, CheckCircle2, AlertCircle, Clock, MapPin } from 'lucide-react';
 
 export const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -47,7 +47,6 @@ export const ContactSection: React.FC = () => {
     if (!validate()) return;
 
     setIsSubmitting(true);
-    // Simulate swift server response
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
@@ -69,17 +68,25 @@ export const ContactSection: React.FC = () => {
     <section id="contact-section" className="py-20 bg-white border-t border-slate-200/80">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left Column: Context & Editorial Office Info */}
+          {/* Left Column: Context & Editorial Office Info in AEO Question-Answer format */}
           <div className="lg:col-span-5 space-y-6">
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-2">
-                Get in Touch
+                Editorial Communications
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                Contact AI Future Hub
+                How Can You Contact the AI Future Hub Editorial Desk?
               </h2>
-              <p className="mt-3 text-sm sm:text-base text-slate-600 leading-relaxed">
-                Have a question about one of our articles, want to propose a technology topic for exploration, or seeking editorial collaboration? We welcome thoughtful inquiries from readers, educators, and researchers.
+              <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 block mb-1">
+                  Direct Answer:
+                </span>
+                <p className="text-sm font-medium text-slate-800 leading-relaxed">
+                  You can reach the AI Future Hub editorial staff by submitting this verified inquiry form or directly emailing <a href="mailto:editorial@aifuturehub.org" className="text-indigo-600 underline font-semibold" aria-label="Send email to editorial@aifuturehub.org">editorial@aifuturehub.org</a>; all reader inquiries receive a response within 24 to 48 business hours.
+                </p>
+              </div>
+              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                Have a question about our research guides, want to propose a future AI topic, or seek educational classroom collaboration? We welcome thoughtful inquiries.
               </p>
             </div>
 
@@ -93,10 +100,12 @@ export const ContactSection: React.FC = () => {
                     Editorial Desk
                   </div>
                   <div className="text-sm font-semibold text-slate-800">
-                    editorial@aifuturehub.org
+                    <a href="mailto:editorial@aifuturehub.org" className="hover:text-indigo-600 transition-colors" aria-label="Email the AI Future Hub editorial team">
+                      editorial@aifuturehub.org
+                    </a>
                   </div>
                   <div className="text-xs text-slate-500">
-                    For article corrections, citations, and contributor submissions
+                    For article citations, errata, and researcher submissions
                   </div>
                 </div>
               </div>
@@ -107,13 +116,13 @@ export const ContactSection: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Response Window
+                    Expected Response Window
                   </div>
                   <div className="text-sm font-semibold text-slate-800">
                     Within 24-48 business hours
                   </div>
                   <div className="text-xs text-slate-500">
-                    Our editorial staff reviews reader letters weekly
+                    Our editorial team reviews submissions on rolling business days
                   </div>
                 </div>
               </div>
@@ -124,10 +133,10 @@ export const ContactSection: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Location
+                    Headquarters
                   </div>
                   <div className="text-sm font-semibold text-slate-800">
-                    San Francisco, California & Remote Global Editorial
+                    San Francisco, California & Global Remote Staff
                   </div>
                 </div>
               </div>
@@ -149,6 +158,7 @@ export const ContactSection: React.FC = () => {
                   <button
                     onClick={handleReset}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                    aria-label="Send another message to the editorial desk"
                   >
                     Send Another Message
                   </button>
@@ -160,7 +170,7 @@ export const ContactSection: React.FC = () => {
                   {/* Name */}
                   <div>
                     <label htmlFor="contact-name" className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                      Your Name <span className="text-rose-500">*</span>
+                      Your Full Name <span className="text-rose-500">*</span>
                     </label>
                     <input
                       id="contact-name"
@@ -171,6 +181,7 @@ export const ContactSection: React.FC = () => {
                         if (errors.name) setErrors({ ...errors, name: '' });
                       }}
                       placeholder="e.g. Alex Morgan"
+                      aria-label="Your full name"
                       className={`w-full px-4 py-3 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors ${
                         errors.name ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-500'
                       }`}
@@ -197,6 +208,7 @@ export const ContactSection: React.FC = () => {
                         if (errors.email) setErrors({ ...errors, email: '' });
                       }}
                       placeholder="e.g. alex@example.com"
+                      aria-label="Your email address"
                       className={`w-full px-4 py-3 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors ${
                         errors.email ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-500'
                       }`}
@@ -222,6 +234,7 @@ export const ContactSection: React.FC = () => {
                       setFormData({ ...formData, subject: e.target.value });
                       if (errors.subject) setErrors({ ...errors, subject: '' });
                     }}
+                    aria-label="Inquiry subject or topic"
                     className={`w-full px-4 py-3 bg-white border rounded-xl text-sm text-slate-900 outline-none transition-colors ${
                       errors.subject ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-500'
                     }`}
@@ -254,6 +267,7 @@ export const ContactSection: React.FC = () => {
                       if (errors.message) setErrors({ ...errors, message: '' });
                     }}
                     placeholder="Share your thoughts, inquiry, or suggested angle in detail..."
+                    aria-label="Message details"
                     className={`w-full px-4 py-3 bg-white border rounded-xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-colors resize-y ${
                       errors.message ? 'border-rose-400 focus:border-rose-500' : 'border-slate-200 focus:border-indigo-500'
                     }`}
@@ -271,6 +285,7 @@ export const ContactSection: React.FC = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-indigo-600 disabled:bg-slate-400 rounded-xl transition-colors cursor-pointer shadow-sm"
+                  aria-label="Submit message to editorial team"
                 >
                   {isSubmitting ? (
                     <span>Sending message...</span>

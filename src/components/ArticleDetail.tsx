@@ -5,14 +5,12 @@ import {
   Bookmark, 
   Share2, 
   Check, 
-  Clock, 
-  Calendar, 
-  User, 
   ChevronRight, 
-  Type, 
   Sparkles,
   BookOpen,
-  ArrowRight
+  ArrowRight,
+  HelpCircle,
+  Lightbulb
 } from 'lucide-react';
 
 interface ArticleDetailProps {
@@ -83,13 +81,19 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
 
       {/* Sticky Reading Header Bar */}
       <nav className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 px-4 sm:px-8 flex items-center justify-between shadow-xs">
-        <button
-          onClick={onBack}
+        <a
+          href="/articles"
+          onClick={(e) => {
+            e.preventDefault();
+            onBack();
+          }}
           className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-100 cursor-pointer"
+          title="Return to all 10 technology articles"
+          aria-label="Return to articles repository"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Articles</span>
-        </button>
+          <span>Return to Articles</span>
+        </a>
 
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Font Size Adjuster */}
@@ -99,7 +103,8 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               className={`px-2 py-1 rounded transition-colors ${
                 fontSize === 'normal' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
               }`}
-              title="Normal font size"
+              title="Normal reading font size"
+              aria-label="Normal reading font size"
             >
               A
             </button>
@@ -108,7 +113,8 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               className={`px-2 py-1 rounded transition-colors text-sm ${
                 fontSize === 'large' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
               }`}
-              title="Large font size"
+              title="Large reading font size"
+              aria-label="Large reading font size"
             >
               A+
             </button>
@@ -117,7 +123,8 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               className={`px-2 py-1 rounded transition-colors text-base ${
                 fontSize === 'xlarge' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
               }`}
-              title="Extra large font size"
+              title="Extra large reading font size"
+              aria-label="Extra large reading font size"
             >
               A++
             </button>
@@ -131,8 +138,8 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
                 ? 'bg-indigo-50 border-indigo-200 text-indigo-600'
                 : 'border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-slate-300'
             }`}
-            title={isBookmarked ? 'Remove bookmark' : 'Save article'}
-            aria-label="Bookmark"
+            title={isBookmarked ? 'Remove article from reading list' : 'Save article to reading list'}
+            aria-label={isBookmarked ? `Remove ${article.title} from saved` : `Bookmark article: ${article.title}`}
           >
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
           </button>
@@ -141,7 +148,8 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
           <button
             onClick={handleCopyLink}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 hover:text-indigo-600 border border-slate-200 hover:border-slate-300 rounded-lg transition-colors cursor-pointer"
-            title="Share article link"
+            title="Copy share link for this article"
+            aria-label="Share article link"
           >
             {copied ? (
               <>
@@ -183,12 +191,26 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
           {article.subtitle}
         </p>
 
+        {/* SEO Keywords info for reader transparency */}
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-slate-500 font-sans">
+          <span className="font-semibold text-slate-700">Primary Focus:</span>
+          <span className="text-indigo-700 font-medium">{article.seo.mainKeyword}</span>
+          <span aria-hidden="true">·</span>
+          <span>{article.seo.relatedKeywords[0]}</span>
+          <span aria-hidden="true">·</span>
+          <span>{article.seo.relatedKeywords[1]}</span>
+        </div>
+
         {/* Author Bio Header */}
         <div className="mt-8 pt-6 border-t border-slate-200/80 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3.5">
             <img
               src={article.author.avatar}
-              alt={article.author.name}
+              alt={`Author portrait of ${article.author.name}, ${article.author.role}`}
+              loading="lazy"
+              decoding="async"
+              width="48"
+              height="48"
               className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100"
             />
             <div>
@@ -198,17 +220,21 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
           </div>
 
           <div className="text-xs text-slate-400">
-            Verified Editorial Piece
+            Verified Editorial & Peer-Reviewed Piece
           </div>
         </div>
       </header>
 
-      {/* Cover Image */}
+      {/* Cover Image (Small footprint, descriptive alt) */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="aspect-[21/9] sm:aspect-[16/8] rounded-2xl overflow-hidden bg-slate-100 shadow-sm border border-slate-200/80">
           <img
             src={article.coverImage}
-            alt={article.title}
+            alt={article.imageAlt}
+            loading="eager"
+            decoding="async"
+            width="720"
+            height="360"
             className="w-full h-full object-cover"
           />
         </div>
@@ -221,14 +247,14 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
           <aside className="hidden lg:block lg:col-span-3">
             <div className="sticky top-20 bg-slate-50 p-5 rounded-2xl border border-slate-200/80 space-y-3">
               <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Contents
+                Contents & Q&A
               </div>
-              <nav className="space-y-2 text-xs">
+              <nav className="space-y-2 text-xs" aria-label="Table of Contents">
                 <a
                   href="#introduction"
                   className="block text-slate-600 hover:text-indigo-600 py-1 transition-colors font-medium"
                 >
-                  Introduction
+                  Introduction Overview
                 </a>
                 {article.sections.map((sec, idx) => (
                   <a
@@ -239,6 +265,14 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
                     {idx + 1}. {sec.heading}
                   </a>
                 ))}
+                {article.faqAeo && article.faqAeo.length > 0 && (
+                  <a
+                    href="#faq-aeo"
+                    className="block text-slate-600 hover:text-indigo-600 py-1 transition-colors font-medium"
+                  >
+                    Quick AEO Questions & Answers
+                  </a>
+                )}
                 <a
                   href="#conclusion"
                   className="block text-slate-600 hover:text-indigo-600 py-1 transition-colors font-medium"
@@ -248,7 +282,7 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               </nav>
 
               <div className="pt-4 border-t border-slate-200 text-[11px] text-slate-400">
-                Reading time: {article.readTime}
+                Estimated Reading time: {article.readTime}
               </div>
             </div>
           </aside>
@@ -269,20 +303,34 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               ))}
             </section>
 
-            {/* Sections */}
+            {/* Sections in AEO Question-and-Answer format */}
             {article.sections.map((section, idx) => (
               <section key={idx} id={`section-${idx}`} className="my-10 pt-4 border-t border-slate-100">
+                {/* H2 in Interrogative Question Format for AEO */}
                 <h2 className="font-sans text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-2">
                   {section.heading}
                 </h2>
                 
                 {section.subheading && (
-                  <h3 className="font-sans text-sm sm:text-base font-semibold text-indigo-700 mb-5">
+                  <h3 className="font-sans text-sm sm:text-base font-semibold text-indigo-700 mb-4">
                     {section.subheading}
                   </h3>
                 )}
 
-                <div className="space-y-5">
+                {/* Direct Answer callout for instant search / AI Answer Engine snippet capture */}
+                {section.directAnswer && (
+                  <div className="my-4 p-4 bg-slate-50 border-l-4 border-indigo-600 rounded-r-xl font-sans text-slate-900">
+                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-indigo-700 mb-1">
+                      <Lightbulb className="w-4 h-4 text-indigo-600" />
+                      <span>Direct Answer:</span>
+                    </div>
+                    <p className="text-sm font-medium leading-relaxed">
+                      {section.directAnswer}
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-5 mt-4">
                   {section.paragraphs.map((p, pIdx) => (
                     <p key={pIdx} className={`${getFontSizeClass()} text-slate-700`}>
                       {p}
@@ -321,6 +369,31 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
               </section>
             ))}
 
+            {/* Dedicated AEO FAQ Section */}
+            {article.faqAeo && article.faqAeo.length > 0 && (
+              <section id="faq-aeo" className="my-12 pt-8 border-t border-slate-200 font-sans">
+                <div className="flex items-center gap-2 text-indigo-600 text-xs font-bold uppercase tracking-wider mb-2">
+                  <HelpCircle className="w-4 h-4" />
+                  <span>Answer Engine Optimization (AEO) Q&A</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">
+                  Common Questions & Direct Answers
+                </h2>
+                <div className="space-y-4">
+                  {article.faqAeo.map((faq, fIdx) => (
+                    <div key={fIdx} className="p-5 bg-slate-50 border border-slate-200/80 rounded-xl">
+                      <h3 className="text-base font-bold text-slate-900 mb-2">
+                        {faq.question}
+                      </h3>
+                      <p className="text-sm text-slate-700 leading-relaxed font-serif-reading">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Conclusion */}
             <section id="conclusion" className="mt-12 pt-8 border-t border-slate-200">
               <h2 className="font-sans text-2xl sm:text-3xl font-bold text-slate-900 mb-4">
@@ -357,7 +430,11 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
             <div className="mt-12 p-6 bg-slate-50 rounded-2xl border border-slate-200 font-sans flex flex-col sm:flex-row items-center gap-5">
               <img
                 src={article.author.avatar}
-                alt={article.author.name}
+                alt={`Portrait of author ${article.author.name}`}
+                loading="lazy"
+                decoding="async"
+                width="64"
+                height="64"
                 className="w-16 h-16 rounded-full object-cover ring-2 ring-slate-200"
               />
               <div className="text-center sm:text-left">
@@ -366,7 +443,7 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">{article.author.name}</h3>
                 <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                  {article.author.role}. Elena writes extensively about human-centered technology, artificial intelligence ethics, and the changing landscape of digital society.
+                  {article.author.role}. Specialist researching human-centered technology, machine learning ethics, and societal transformation.
                 </p>
               </div>
             </div>
@@ -394,13 +471,18 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
                 <h3 className="text-2xl font-bold text-slate-900">Recommended Next Reads</h3>
                 <p className="text-xs sm:text-sm text-slate-500">Continue exploring artificial intelligence and technology</p>
               </div>
-              <button
-                onClick={onBack}
+              <a
+                href="/articles"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onBack();
+                }}
                 className="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+                aria-label="View all 10 artificial intelligence articles"
               >
                 <span>View all articles</span>
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -417,15 +499,34 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
                       <span>{item.readTime}</span>
                     </div>
                     <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                      {item.title}
+                      <a
+                        href={item.seo.canonicalPath}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectArticle(item);
+                        }}
+                        className="hover:underline"
+                      >
+                        {item.title}
+                      </a>
                     </h4>
                     <p className="mt-2 text-xs text-slate-600 line-clamp-2">
                       {item.summary}
                     </p>
                   </div>
                   <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-semibold">
-                    <span>Read Article</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <a
+                      href={item.seo.canonicalPath}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onSelectArticle(item);
+                      }}
+                      className="inline-flex items-center gap-1 hover:text-indigo-800"
+                      aria-label={`Read recommended article: ${item.title}`}
+                    >
+                      <span>Read Guide</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </a>
                   </div>
                 </div>
               ))}

@@ -15,7 +15,7 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
   bookmarkedIds,
   onToggleBookmark,
 }) => {
-  // Select 3 featured articles (e.g. articles marked featured or top 3)
+  // Select 3 featured articles
   const featured = articles.filter((a) => a.featured).slice(0, 3);
   const primaryArticle = featured[0];
   const secondaryArticles = featured.slice(1, 3);
@@ -51,7 +51,11 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
             <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
               <img
                 src={primaryArticle.coverImage}
-                alt={primaryArticle.title}
+                alt={primaryArticle.imageAlt || `${primaryArticle.title} - Featured AI analysis`}
+                loading="lazy"
+                decoding="async"
+                width="720"
+                height="450"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <button
@@ -61,7 +65,8 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                     ? 'bg-indigo-600 text-white shadow-md'
                     : 'bg-white/80 text-slate-700 hover:bg-white hover:text-indigo-600 shadow-sm'
                 }`}
-                aria-label="Bookmark featured article"
+                title={bookmarkedIds.includes(primaryArticle.id) ? `Remove ${primaryArticle.title} from saved` : `Save ${primaryArticle.title}`}
+                aria-label={bookmarkedIds.includes(primaryArticle.id) ? `Remove bookmark for ${primaryArticle.title}` : `Bookmark featured article: ${primaryArticle.title}`}
               >
                 <Bookmark className={`w-4 h-4 ${bookmarkedIds.includes(primaryArticle.id) ? 'fill-current' : ''}`} />
               </button>
@@ -81,7 +86,16 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">
-                  {primaryArticle.title}
+                  <a
+                    href={primaryArticle.seo.canonicalPath}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onReadArticle(primaryArticle);
+                    }}
+                    className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                  >
+                    {primaryArticle.title}
+                  </a>
                 </h3>
                 <p className="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed line-clamp-3">
                   {primaryArticle.summary}
@@ -92,7 +106,11 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                 <div className="flex items-center gap-3">
                   <img
                     src={primaryArticle.author.avatar}
-                    alt={primaryArticle.author.name}
+                    alt={`Author portrait of ${primaryArticle.author.name}`}
+                    loading="lazy"
+                    decoding="async"
+                    width="36"
+                    height="36"
                     className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200"
                   />
                   <div>
@@ -105,13 +123,19 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                   </div>
                 </div>
 
-                <button
-                  onClick={() => onReadArticle(primaryArticle)}
+                <a
+                  href={primaryArticle.seo.canonicalPath}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onReadArticle(primaryArticle);
+                  }}
                   className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-indigo-600 rounded-xl transition-colors cursor-pointer"
+                  aria-label={`Read featured guide: ${primaryArticle.title}`}
                 >
                   <span>Read Article</span>
+                  <span className="sr-only">: {primaryArticle.title}</span>
                   <ArrowRight className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -139,14 +163,24 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                         className={`p-1.5 rounded-lg transition-colors ${
                           isSaved ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-indigo-600'
                         }`}
-                        aria-label="Bookmark article"
+                        title={isSaved ? `Remove ${article.title} from saved` : `Save ${article.title}`}
+                        aria-label={isSaved ? `Remove bookmark for ${article.title}` : `Bookmark article: ${article.title}`}
                       >
                         <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
                       </button>
                     </div>
 
                     <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
-                      {article.title}
+                      <a
+                        href={article.seo.canonicalPath}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onReadArticle(article);
+                        }}
+                        className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
+                      >
+                        {article.title}
+                      </a>
                     </h3>
                     <p className="mt-2 text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
                       {article.summary}
@@ -157,7 +191,11 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                     <div className="flex items-center gap-2">
                       <img
                         src={article.author.avatar}
-                        alt={article.author.name}
+                        alt={`Author portrait of ${article.author.name}`}
+                        loading="lazy"
+                        decoding="async"
+                        width="24"
+                        height="24"
                         className="w-6 h-6 rounded-full object-cover"
                       />
                       <span className="text-xs font-medium text-slate-700">
@@ -165,13 +203,19 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => onReadArticle(article)}
+                    <a
+                      href={article.seo.canonicalPath}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onReadArticle(article);
+                      }}
                       className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors group/btn py-1 px-2.5 rounded-lg hover:bg-indigo-50 cursor-pointer"
+                      aria-label={`Read analysis: ${article.title}`}
                     >
                       <span>Read Article</span>
+                      <span className="sr-only">: {article.title}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-                    </button>
+                    </a>
                   </div>
                 </div>
               );

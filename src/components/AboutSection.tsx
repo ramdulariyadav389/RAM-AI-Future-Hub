@@ -1,21 +1,30 @@
 import React from 'react';
-import { Compass, ShieldCheck, Cpu, Lightbulb, Users, CheckCircle2, Award, BookOpen } from 'lucide-react';
+import { Compass, ShieldCheck, Cpu, Lightbulb, CheckCircle2, Award, ArrowRight } from 'lucide-react';
 
-export const AboutSection: React.FC = () => {
+interface AboutSectionProps {
+  onExploreArticles?: () => void;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ onExploreArticles }) => {
   return (
     <section id="about-section" className="py-20 bg-slate-50 border-t border-slate-200/80">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Header with AEO Question & Direct Answer */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-2">
-            Our Mission & Editorial Values
+            Editorial Mission & Focus
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            About AI Future Hub
+            Why Does AI Future Hub Exist and What Is Our Mission?
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
-            AI Future Hub exists to make artificial intelligence easier to understand, explore, and navigate for everyone. We translate complex algorithmic frontiers into practical knowledge, responsible guidance, and forward-looking clarity.
-          </p>
+          <div className="mt-4 p-4 bg-white border border-indigo-100 rounded-xl shadow-xs text-left max-w-2xl mx-auto">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 block mb-1">
+              Direct Mission Statement:
+            </span>
+            <p className="text-sm font-medium text-slate-800 leading-relaxed">
+              AI Future Hub exists to translate complex algorithmic research into clear, practical, and grounded insights so students, professionals, and technology enthusiasts can navigate the future of artificial intelligence responsibly.
+            </p>
+          </div>
         </div>
 
         {/* 4 Core Pillars */}
@@ -24,7 +33,7 @@ export const AboutSection: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
               <Lightbulb className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Demystifying Complexity</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Demystifying Complex Concepts</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
               We reject incomprehensible jargon and hyperbolic claims. Our articles deconstruct large language models, neural vision, and autonomous agents into intuitive concepts that anyone can grasp without an advanced degree in computer science.
             </p>
@@ -34,7 +43,7 @@ export const AboutSection: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
               <Cpu className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Practical Knowledge</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Practical Everyday Knowledge</h3>
             <p className="text-sm text-slate-600 leading-relaxed">
               Technology matters most when it improves everyday human lives. We focus on real-world utility—from small business productivity tactics to educational study habits and clinical healthcare innovations.
             </p>
@@ -66,10 +75,10 @@ export const AboutSection: React.FC = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-                Editorial Integrity
+                Editorial Rigor & Verification
               </span>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
-                How We Research & Write
+                How Do We Fact-Check and Verify AI Trends?
               </h3>
             </div>
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
@@ -109,6 +118,23 @@ export const AboutSection: React.FC = () => {
               </p>
             </div>
           </div>
+
+          {onExploreArticles && (
+            <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center">
+              <a
+                href="/articles"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onExploreArticles();
+                }}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors py-2 px-4 rounded-xl hover:bg-indigo-50"
+                aria-label="Explore our 10 comprehensive artificial intelligence guides"
+              >
+                <span>Explore Our 10 Artificial Intelligence Guides</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </section>

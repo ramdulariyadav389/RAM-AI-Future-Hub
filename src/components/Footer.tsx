@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivePage } from '../types';
-import { ArrowUp, Mail, CheckCircle2, BookOpen } from 'lucide-react';
+import { ArrowUp, CheckCircle2 } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (page: ActivePage) => void;
@@ -44,14 +44,23 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
           {/* Brand & Mission (4 cols) */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="flex items-center gap-3">
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('home');
+              }}
+              className="flex items-center gap-3 text-white hover:text-indigo-400 transition-colors"
+              title="AI Future Hub Homepage"
+              aria-label="Return to AI Future Hub homepage"
+            >
               <div className="w-9 h-9 rounded-xl bg-white text-slate-950 flex items-center justify-center font-black text-sm tracking-tighter">
                 AI
               </div>
               <span className="text-xl font-bold tracking-tight text-white">
                 AI Future Hub
               </span>
-            </div>
+            </a>
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
               An independent educational resource dedicated to making artificial intelligence clear, practical, and accessible for everyone. Understanding AI today, preparing for tomorrow.
             </p>
@@ -65,38 +74,62 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
               Navigation
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-sm" aria-label="Footer navigation links">
               <li>
-                <button
-                  onClick={() => onNavigate('home')}
+                <a
+                  href="/"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('home');
+                  }}
                   className="hover:text-white transition-colors cursor-pointer"
+                  title="Navigate to AI Future Hub home page"
+                  aria-label="AI Future Hub Homepage"
                 >
                   Home
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('articles')}
+                <a
+                  href="/articles"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('articles');
+                  }}
                   className="hover:text-white transition-colors cursor-pointer"
+                  title="Browse all 10 technology articles"
+                  aria-label="All 10 Artificial Intelligence Articles"
                 >
                   Articles
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('about')}
+                <a
+                  href="/about"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('about');
+                  }}
                   className="hover:text-white transition-colors cursor-pointer"
+                  title="Learn about AI Future Hub mission and editorial standards"
+                  aria-label="About AI Future Hub Mission"
                 >
                   About
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  onClick={() => onNavigate('contact')}
+                <a
+                  href="/contact"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('contact');
+                  }}
                   className="hover:text-white transition-colors cursor-pointer"
+                  title="Contact our editorial desk"
+                  aria-label="Contact AI Future Hub Editorial Desk"
                 >
                   Contact
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -106,18 +139,22 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
             <h4 className="text-xs font-bold uppercase tracking-wider text-white">
               Core Disciplines
             </h4>
-            <div className="grid grid-cols-1 gap-1.5 text-xs text-slate-400">
+            <div className="grid grid-cols-1 gap-1.5 text-xs text-slate-400" aria-label="Browse articles by core discipline">
               {featuredTopics.map((topic) => (
-                <button
+                <a
                   key={topic}
-                  onClick={() => {
+                  href="/articles"
+                  onClick={(e) => {
+                    e.preventDefault();
                     onSelectCategory(topic);
                     onNavigate('articles');
                   }}
-                  className="text-left hover:text-indigo-400 transition-colors py-0.5 truncate cursor-pointer"
+                  className="text-left hover:text-indigo-400 transition-colors py-0.5 truncate cursor-pointer block"
+                  aria-label={`Explore artificial intelligence articles in ${topic}`}
+                  title={`View articles about ${topic}`}
                 >
                   {topic}
-                </button>
+                </a>
               ))}
             </div>
           </div>
@@ -147,11 +184,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
                       if (subscribeError) setSubscribeError('');
                     }}
                     placeholder="Enter your email..."
+                    aria-label="Email address for monthly technology dispatch"
                     className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:border-indigo-400 transition-colors"
                   />
                   <button
                     type="submit"
                     className="mt-2 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                    aria-label="Subscribe to monthly technology research dispatch"
                   >
                     Subscribe to Dispatch
                   </button>
@@ -178,6 +217,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
             <button
               onClick={scrollToTop}
               className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              aria-label="Scroll back to top of page"
             >
               <span>Back to Top</span>
               <ArrowUp className="w-3.5 h-3.5" />

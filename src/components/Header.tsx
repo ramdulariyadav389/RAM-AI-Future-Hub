@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivePage } from '../types';
-import { Sparkles, Bookmark, Menu, X, Search, Compass, BookOpen, Info, Mail } from 'lucide-react';
+import { Bookmark, Menu, X, Search, Compass, BookOpen, Info, Mail } from 'lucide-react';
 
 interface HeaderProps {
   activePage: ActivePage;
@@ -20,13 +20,14 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { label: 'Home', page: 'home' as ActivePage, icon: Compass },
-    { label: 'Articles', page: 'articles' as ActivePage, icon: BookOpen },
-    { label: 'About', page: 'about' as ActivePage, icon: Info },
-    { label: 'Contact', page: 'contact' as ActivePage, icon: Mail },
+    { label: 'Home', page: 'home' as ActivePage, path: '/', icon: Compass, title: 'AI Future Hub Homepage' },
+    { label: 'Articles', page: 'articles' as ActivePage, path: '/articles', icon: BookOpen, title: 'All Technology Articles and Research Guides' },
+    { label: 'About', page: 'about' as ActivePage, path: '/about', icon: Info, title: 'About AI Future Hub Mission and Editorial Standards' },
+    { label: 'Contact', page: 'contact' as ActivePage, path: '/contact', icon: Mail, title: 'Contact the AI Future Hub Editorial Desk' },
   ];
 
-  const handleNavClick = (page: ActivePage) => {
+  const handleNavClick = (page: ActivePage, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     onNavigate(page);
     setMobileMenuOpen(false);
   };
@@ -35,11 +36,13 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18">
-          {/* Logo */}
-          <button
-            onClick={() => handleNavClick('home')}
+          {/* Logo with descriptive anchor text for search engines */}
+          <a
+            href="/"
+            onClick={(e) => handleNavClick('home', e)}
             className="flex items-center gap-3 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1"
-            aria-label="AI Future Hub Home"
+            title="AI Future Hub - Understanding AI Today. Preparing for Tomorrow."
+            aria-label="AI Future Hub Homepage"
           >
             <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold tracking-tight shadow-sm group-hover:bg-indigo-600 transition-colors">
               <span className="text-sm font-black tracking-tighter">AI</span>
@@ -52,27 +55,29 @@ export const Header: React.FC<HeaderProps> = ({
                 Technology & Society
               </span>
             </div>
-          </button>
+          </a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Main Navigation">
+          {/* Desktop Navigation with descriptive anchor text */}
+          <nav className="hidden md:flex items-center gap-8" aria-label="Main Editorial Navigation">
             {navItems.map((item) => {
               const isActive = activePage === item.page;
               return (
-                <button
+                <a
                   key={item.label}
-                  onClick={() => handleNavClick(item.page)}
+                  href={item.path}
+                  onClick={(e) => handleNavClick(item.page, e)}
+                  title={item.title}
                   className={`relative py-2 text-sm font-medium transition-colors cursor-pointer ${
                     isActive
                       ? 'text-indigo-600 font-semibold'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full" />
                   )}
-                </button>
+                </a>
               );
             })}
           </nav>
@@ -82,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenSearchFocus}
               className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200/80 rounded-lg transition-colors border border-slate-200/60"
-              aria-label="Search articles"
+              aria-label="Search all 10 artificial intelligence articles"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Search articles...</span>
@@ -95,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenBookmarks}
               className="relative p-2 text-slate-600 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-colors"
               title="Saved reading list"
-              aria-label={`Reading list: ${bookmarksCount} articles saved`}
+              aria-label={`Open reading list: ${bookmarksCount} articles saved`}
             >
               <Bookmark className="w-4 h-4" />
               {bookmarksCount > 0 && (
@@ -109,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenBookmarks}
               className="relative p-2 text-slate-600 hover:text-indigo-600 rounded-lg"
-              aria-label="Saved articles"
+              aria-label={`Open saved articles: ${bookmarksCount} saved`}
             >
               <Bookmark className="w-5 h-5" />
               {bookmarksCount > 0 && (
@@ -119,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 text-slate-700 hover:text-slate-900 rounded-lg"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -139,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-500 bg-slate-100 rounded-lg border border-slate-200"
             >
               <Search className="w-4 h-4 text-slate-400" />
-              <span>Search 10 articles...</span>
+              <span>Search 10 AI articles...</span>
             </button>
           </div>
 
@@ -148,9 +153,11 @@ export const Header: React.FC<HeaderProps> = ({
               const Icon = item.icon;
               const isActive = activePage === item.page;
               return (
-                <button
+                <a
                   key={item.label}
-                  onClick={() => handleNavClick(item.page)}
+                  href={item.path}
+                  onClick={(e) => handleNavClick(item.page, e)}
+                  title={item.title}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
                     isActive
                       ? 'bg-indigo-50 text-indigo-700 font-semibold'
@@ -159,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <Icon className="w-5 h-5 text-slate-400" />
                   <span>{item.label}</span>
-                </button>
+                </a>
               );
             })}
           </div>
