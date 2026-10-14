@@ -1,0 +1,6 @@
+# AI Future Hub - Robots Directive
+User-agent: *
+Allow: /
+
+# Sitemap reference
+Sitemap: https://ram-ai-future-hub-bice.vercel.app/sitemap.xml

@@ -1,6 +1,7 @@
-import { SEOData, FaqItem } from '../types';
+import { SEOData, FaqItem, Article } from '../types';
 
 export const SITE_NAME = 'AI Future Hub';
+export const PRODUCTION_DOMAIN = 'https://ram-ai-future-hub-bice.vercel.app';
 
 // Static SEO metadata for primary pages
 export const PAGE_SEO_CONFIG: Record<string, SEOData> = {
@@ -34,13 +35,141 @@ export const PAGE_SEO_CONFIG: Record<string, SEOData> = {
   },
 };
 
-export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: string) {
+/**
+ * Generates valid Schema.org JSON-LD structured data for WebSite, Organization,
+ * Articles (BlogPosting), BreadcrumbList, and FAQPage.
+ */
+export function generatePageSchema(seo: SEOData, faqs?: FaqItem[], article?: Article): object {
+  const canonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '' : seo.canonicalPath}`;
+
+  const graph: any[] = [
+    {
+      '@type': 'WebSite',
+      '@id': `${PRODUCTION_DOMAIN}/#website`,
+      url: `${PRODUCTION_DOMAIN}/`,
+      name: SITE_NAME,
+      description: 'Understanding AI Today. Preparing for Tomorrow.',
+      inLanguage: 'en-US',
+      publisher: {
+        '@type': 'Organization',
+        '@id': `${PRODUCTION_DOMAIN}/#organization`,
+        name: SITE_NAME,
+        url: `${PRODUCTION_DOMAIN}/`,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${PRODUCTION_DOMAIN}/favicon.svg`,
+        },
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${PRODUCTION_DOMAIN}/#organization`,
+      name: SITE_NAME,
+      url: `${PRODUCTION_DOMAIN}/`,
+      logo: `${PRODUCTION_DOMAIN}/favicon.svg`,
+      description: 'An independent educational publication dedicated to making artificial intelligence clear, practical, and accessible for everyone.',
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: seo.pageTitle,
+      description: seo.metaDescription,
+      isPartOf: {
+        '@id': `${PRODUCTION_DOMAIN}/#website`,
+      },
+      inLanguage: 'en-US',
+    },
+  ];
+
+  // If this is an article page, append BlogPosting and BreadcrumbList schemas
+  if (article) {
+    graph.push({
+      '@type': 'BlogPosting',
+      '@id': `${canonicalUrl}#article`,
+      isPartOf: {
+        '@id': `${PRODUCTION_DOMAIN}/#website`,
+      },
+      headline: article.title,
+      description: article.seo.metaDescription,
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      datePublished: '2026-10-01T08:00:00+00:00',
+      dateModified: '2026-10-14T08:00:00+00:00',
+      inLanguage: 'en-US',
+      articleSection: article.category,
+      wordCount: article.wordCount,
+      image: article.coverImage,
+      author: {
+        '@type': 'Person',
+        name: article.author.name,
+        jobTitle: article.author.role,
+        image: article.author.avatar,
+      },
+      publisher: {
+        '@id': `${PRODUCTION_DOMAIN}/#organization`,
+      },
+      keywords: [article.seo.mainKeyword, ...article.seo.relatedKeywords].join(', '),
+    });
+
+    graph.push({
+      '@type': 'BreadcrumbList',
+      '@id': `${canonicalUrl}#breadcrumb`,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: `${PRODUCTION_DOMAIN}/`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Articles',
+          item: `${PRODUCTION_DOMAIN}/articles`,
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          name: article.title,
+          item: canonicalUrl,
+        },
+      ],
+    });
+  }
+
+  // If FAQ / AEO Q&A items are provided, append FAQPage schema
+  if (faqs && faqs.length > 0) {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${canonicalUrl}#faq`,
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  };
+}
+
+/**
+ * Client-side DOM metadata updater for dynamic single-page navigation.
+ */
+export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: string, article?: Article) {
   if (typeof document === 'undefined') return;
 
-  // 1. Page Title (Title rule: 50-60 characters, front-loaded keyword)
+  // 1. Page Title
   document.title = seo.pageTitle;
 
-  // 2. Meta Description (Description rule: 140-160 characters, contains main keyword)
+  // 2. Meta Description
   let descMeta = document.querySelector('meta[name="description"]');
   if (!descMeta) {
     descMeta = document.createElement('meta');
@@ -49,7 +178,7 @@ export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: st
   }
   descMeta.setAttribute('content', seo.metaDescription);
 
-  // 3. Keywords Meta Tag (Main keyword + 2 related keywords)
+  // 3. Keywords Meta Tag
   const keywordsList = [seo.mainKeyword, ...seo.relatedKeywords].join(', ');
   let kwMeta = document.querySelector('meta[name="keywords"]');
   if (!kwMeta) {
@@ -60,10 +189,7 @@ export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: st
   kwMeta.setAttribute('content', keywordsList);
 
   // 4. Canonical Link
-  const fullCanonicalUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}${seo.canonicalPath}`
-    : seo.canonicalPath;
-
+  const fullCanonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '' : seo.canonicalPath}`;
   let canonicalLink = document.querySelector('link[rel="canonical"]');
   if (!canonicalLink) {
     canonicalLink = document.createElement('link');
@@ -76,18 +202,21 @@ export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: st
   setMetaTag('property', 'og:title', seo.pageTitle);
   setMetaTag('property', 'og:description', seo.metaDescription);
   setMetaTag('property', 'og:url', fullCanonicalUrl);
+  setMetaTag('property', 'og:site_name', SITE_NAME);
+  setMetaTag('property', 'og:type', article ? 'article' : 'website');
   if (imageUrl) {
     setMetaTag('property', 'og:image', imageUrl);
   }
 
   // 6. Twitter Card Tags
+  setMetaTag('name', 'twitter:card', 'summary_large_image');
   setMetaTag('name', 'twitter:title', seo.pageTitle);
   setMetaTag('name', 'twitter:description', seo.metaDescription);
   if (imageUrl) {
     setMetaTag('name', 'twitter:image', imageUrl);
   }
 
-  // 7. Schema.org JSON-LD Structured Data (including FAQPage for AEO)
+  // 7. Schema.org JSON-LD Structured Data
   let schemaScript = document.getElementById('seo-structured-data');
   if (!schemaScript) {
     schemaScript = document.createElement('script');
@@ -96,42 +225,7 @@ export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: st
     document.head.appendChild(schemaScript);
   }
 
-  const structuredData: any = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebSite',
-        '@id': `${window.location.origin}/#website`,
-        'url': window.location.origin,
-        'name': SITE_NAME,
-        'description': 'Understanding AI Today. Preparing for Tomorrow.',
-      },
-      {
-        '@type': 'WebPage',
-        '@id': `${fullCanonicalUrl}#webpage`,
-        'url': fullCanonicalUrl,
-        'name': seo.pageTitle,
-        'description': seo.metaDescription,
-        'keywords': keywordsList,
-      }
-    ]
-  };
-
-  // If FAQs are provided, add FAQPage entity for Answer Engine Optimization (AEO)
-  if (faqs && faqs.length > 0) {
-    structuredData['@graph'].push({
-      '@type': 'FAQPage',
-      'mainEntity': faqs.map((faq) => ({
-        '@type': 'Question',
-        'name': faq.question,
-        'acceptedAnswer': {
-          '@type': 'Answer',
-          'text': faq.answer,
-        },
-      })),
-    });
-  }
-
+  const structuredData = generatePageSchema(seo, faqs, article);
   schemaScript.textContent = JSON.stringify(structuredData, null, 2);
 }
 

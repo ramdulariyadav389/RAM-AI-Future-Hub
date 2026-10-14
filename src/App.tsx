@@ -18,20 +18,44 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { BookmarksModal } from './components/BookmarksModal';
 
-export default function App() {
-  const [activePage, setActivePage] = useState<ActivePage>('home');
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+interface AppProps {
+  initialPath?: string;
+  initialArticle?: Article;
+}
+
+export default function App({ initialPath, initialArticle }: AppProps = {}) {
+  // Compute initial states from initial props (supports both SSG pre-rendering and SSR)
+  const computeInitialState = (): { page: ActivePage; article: Article | null } => {
+    if (initialArticle) {
+      return { page: 'article-detail', article: initialArticle };
+    }
+    if (initialPath) {
+      if (initialPath.startsWith('/articles/')) {
+        const slug = initialPath.replace('/articles/', '').replace(/\/$/, '');
+        const matched = ARTICLES.find((a) => a.slug === slug);
+        if (matched) return { page: 'article-detail', article: matched };
+      }
+      if (initialPath === '/articles') return { page: 'articles', article: null };
+      if (initialPath === '/about') return { page: 'about', article: null };
+      if (initialPath === '/contact') return { page: 'contact', article: null };
+    }
+    return { page: 'home', article: null };
+  };
+
+  const initial = computeInitialState();
+  const [activePage, setActivePage] = useState<ActivePage>(initial.page);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(initial.article);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [bookmarksModalOpen, setBookmarksModalOpen] = useState(false);
 
-  // Initialize bookmarks from localStorage
+  // Initialize bookmarks from localStorage on client
   useEffect(() => {
     setBookmarkedIds(getBookmarkedIds());
   }, []);
 
-  // Parse path or hash to resolve active route
+  // Parse path or hash to resolve active route on client
   const resolveRouteFromLocation = () => {
     if (typeof window === 'undefined') return;
 
@@ -52,7 +76,7 @@ export default function App() {
       if (matched) {
         setSelectedArticle(matched);
         setActivePage('article-detail');
-        updatePageMetadata(matched.seo, matched.faqAeo, matched.coverImage);
+        updatePageMetadata(matched.seo, matched.faqAeo, matched.coverImage, matched);
         return;
       }
     }
@@ -168,7 +192,7 @@ export default function App() {
       window.history.pushState(null, '', path);
     }
 
-    updatePageMetadata(article.seo, article.faqAeo, article.coverImage);
+    updatePageMetadata(article.seo, article.faqAeo, article.coverImage, article);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

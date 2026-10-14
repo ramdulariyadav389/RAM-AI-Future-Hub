@@ -1,0 +1,16 @@
+{
+  "name": "AI Future Hub",
+  "short_name": "AI Future Hub",
+  "description": "Understanding AI Today. Preparing for Tomorrow. An authoritative educational blog exploring artificial intelligence and technology.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64 192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
