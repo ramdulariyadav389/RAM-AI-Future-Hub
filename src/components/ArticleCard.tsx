@@ -22,6 +22,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         <img
           src={article.coverImage}
           alt={article.imageAlt || `${article.title} - Artificial Intelligence exploration`}
+          referrerPolicy="no-referrer"
           loading="lazy"
           decoding="async"
           width="720"
@@ -85,6 +86,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             <img
               src={article.author.avatar}
               alt={`Portrait of ${article.author.name}, ${article.author.role}`}
+              referrerPolicy="no-referrer"
               loading="lazy"
               decoding="async"
               width="28"

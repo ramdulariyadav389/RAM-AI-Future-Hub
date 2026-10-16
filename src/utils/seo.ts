@@ -99,7 +99,9 @@ export function generatePageSchema(seo: SEOData, faqs?: FaqItem[], article?: Art
       inLanguage: 'en-US',
       articleSection: article.category,
       wordCount: article.wordCount,
-      image: article.coverImage,
+      image: article.coverImage.startsWith('http')
+        ? article.coverImage
+        : `${PRODUCTION_DOMAIN}${article.coverImage.startsWith('/') ? '' : '/'}${article.coverImage}`,
       author: {
         '@type': 'Person',
         name: article.author.name,

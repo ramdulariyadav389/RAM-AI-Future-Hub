@@ -207,6 +207,7 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
             <img
               src={article.author.avatar}
               alt={`Author portrait of ${article.author.name}, ${article.author.role}`}
+              referrerPolicy="no-referrer"
               loading="lazy"
               decoding="async"
               width="48"
@@ -231,6 +232,7 @@ export const ArticleDetail: React.FC<ArticleDetailProps> = ({
           <img
             src={article.coverImage}
             alt={article.imageAlt}
+            referrerPolicy="no-referrer"
             loading="eager"
             decoding="async"
             width="720"

@@ -129,16 +129,19 @@ async function prerender() {
     pageHtml = updateOrCreateMeta(pageHtml, 'property', 'og:url', canonicalUrl);
     pageHtml = updateOrCreateMeta(pageHtml, 'property', 'og:site_name', SITE_NAME);
     pageHtml = updateOrCreateMeta(pageHtml, 'property', 'og:type', route.article ? 'article' : 'website');
-    if (route.imageUrl) {
-      pageHtml = updateOrCreateMeta(pageHtml, 'property', 'og:image', route.imageUrl);
+    const absoluteImageUrl = route.imageUrl
+      ? (route.imageUrl.startsWith('http') ? route.imageUrl : `${PRODUCTION_DOMAIN}${route.imageUrl.startsWith('/') ? '' : '/'}${route.imageUrl}`)
+      : undefined;
+    if (absoluteImageUrl) {
+      pageHtml = updateOrCreateMeta(pageHtml, 'property', 'og:image', absoluteImageUrl);
     }
 
     // 6. Replace Twitter Card Tags
     pageHtml = updateOrCreateMeta(pageHtml, 'name', 'twitter:card', 'summary_large_image');
     pageHtml = updateOrCreateMeta(pageHtml, 'name', 'twitter:title', route.seo.pageTitle);
     pageHtml = updateOrCreateMeta(pageHtml, 'name', 'twitter:description', route.seo.metaDescription);
-    if (route.imageUrl) {
-      pageHtml = updateOrCreateMeta(pageHtml, 'name', 'twitter:image', route.imageUrl);
+    if (absoluteImageUrl) {
+      pageHtml = updateOrCreateMeta(pageHtml, 'name', 'twitter:image', absoluteImageUrl);
     }
 
     // 7. Inject Schema.org JSON-LD

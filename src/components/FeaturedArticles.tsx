@@ -52,6 +52,7 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
               <img
                 src={primaryArticle.coverImage}
                 alt={primaryArticle.imageAlt || `${primaryArticle.title} - Featured AI analysis`}
+                referrerPolicy="no-referrer"
                 loading="lazy"
                 decoding="async"
                 width="720"
@@ -107,6 +108,7 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                   <img
                     src={primaryArticle.author.avatar}
                     alt={`Author portrait of ${primaryArticle.author.name}`}
+                    referrerPolicy="no-referrer"
                     loading="lazy"
                     decoding="async"
                     width="36"
@@ -192,6 +194,7 @@ export const FeaturedArticles: React.FC<FeaturedArticlesProps> = ({
                       <img
                         src={article.author.avatar}
                         alt={`Author portrait of ${article.author.name}`}
+                        referrerPolicy="no-referrer"
                         loading="lazy"
                         decoding="async"
                         width="24"
