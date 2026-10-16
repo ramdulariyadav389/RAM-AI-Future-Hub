@@ -69,7 +69,7 @@ async function prerender() {
   console.log(`Starting static pre-rendering (SSG) for ${routes.length} pages...`);
 
   for (const route of routes) {
-    const canonicalUrl = `${PRODUCTION_DOMAIN}${route.seo.canonicalPath === '/' ? '' : route.seo.canonicalPath}`;
+    const canonicalUrl = `${PRODUCTION_DOMAIN}${route.seo.canonicalPath === '/' ? '/' : route.seo.canonicalPath}`;
     const keywordsString = [route.seo.mainKeyword, ...route.seo.relatedKeywords].join(', ');
     const schemaObj = generatePageSchema(route.seo, route.faqs, route.article);
     const schemaJson = JSON.stringify(schemaObj, null, 2);

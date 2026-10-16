@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap reference
-Sitemap: https://ram-ai-future-hub-bice.vercel.app/sitemap.xml
+Sitemap: https://ram-ai-future-hub-xi1.vercel.app/sitemap.xml

@@ -1,7 +1,7 @@
 import { SEOData, FaqItem, Article } from '../types';
 
 export const SITE_NAME = 'AI Future Hub';
-export const PRODUCTION_DOMAIN = 'https://ram-ai-future-hub-bice.vercel.app';
+export const PRODUCTION_DOMAIN = 'https://ram-ai-future-hub-xi1.vercel.app';
 
 // Static SEO metadata for primary pages
 export const PAGE_SEO_CONFIG: Record<string, SEOData> = {
@@ -40,7 +40,7 @@ export const PAGE_SEO_CONFIG: Record<string, SEOData> = {
  * Articles (BlogPosting), BreadcrumbList, and FAQPage.
  */
 export function generatePageSchema(seo: SEOData, faqs?: FaqItem[], article?: Article): object {
-  const canonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '' : seo.canonicalPath}`;
+  const canonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '/' : seo.canonicalPath}`;
 
   const graph: any[] = [
     {
