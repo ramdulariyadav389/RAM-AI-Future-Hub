@@ -54,4 +54,4 @@ export interface Article {
   tags: string[];
 }
 
-export type ActivePage = 'home' | 'articles' | 'about' | 'contact' | 'article-detail';
+export type ActivePage = 'home' | 'articles' | 'about' | 'contact' | 'article-detail' | '404';

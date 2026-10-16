@@ -33,6 +33,13 @@ export const PAGE_SEO_CONFIG: Record<string, SEOData> = {
     relatedKeywords: ['AI Editorial Inquiries', 'Technology Writer Feedback'],
     canonicalPath: '/contact',
   },
+  '404': {
+    pageTitle: 'Page Not Found | AI Future Hub',
+    metaDescription: 'The requested page could not be found on AI Future Hub. Return to the homepage or browse our in-depth artificial intelligence research articles.',
+    mainKeyword: 'Page Not Found',
+    relatedKeywords: ['404 Error', 'AI Research Hub'],
+    canonicalPath: '/404',
+  },
 };
 
 /**
@@ -191,7 +198,7 @@ export function updatePageMetadata(seo: SEOData, faqs?: FaqItem[], imageUrl?: st
   kwMeta.setAttribute('content', keywordsList);
 
   // 4. Canonical Link
-  const fullCanonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '' : seo.canonicalPath}`;
+  const fullCanonicalUrl = `${PRODUCTION_DOMAIN}${seo.canonicalPath === '/' ? '/' : seo.canonicalPath}`;
   let canonicalLink = document.querySelector('link[rel="canonical"]');
   if (!canonicalLink) {
     canonicalLink = document.createElement('link');

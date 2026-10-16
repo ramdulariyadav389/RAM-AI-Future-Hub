@@ -34,10 +34,12 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
         const slug = initialPath.replace('/articles/', '').replace(/\/$/, '');
         const matched = ARTICLES.find((a) => a.slug === slug);
         if (matched) return { page: 'article-detail', article: matched };
+        return { page: '404', article: null };
       }
       if (initialPath === '/articles') return { page: 'articles', article: null };
       if (initialPath === '/about') return { page: 'about', article: null };
       if (initialPath === '/contact') return { page: 'contact', article: null };
+      if (initialPath === '/404') return { page: '404', article: null };
     }
     return { page: 'home', article: null };
   };
@@ -78,6 +80,11 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
         setActivePage('article-detail');
         updatePageMetadata(matched.seo, matched.faqAeo, matched.coverImage, matched);
         return;
+      } else {
+        setSelectedArticle(null);
+        setActivePage('404');
+        updatePageMetadata(PAGE_SEO_CONFIG['404']);
+        return;
       }
     }
 
@@ -105,10 +112,26 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
       return;
     }
 
-    // Default: Home
+    // Check /404 or #404
+    if (pathname === '/404' || hash === '404') {
+      setSelectedArticle(null);
+      setActivePage('404');
+      updatePageMetadata(PAGE_SEO_CONFIG['404']);
+      return;
+    }
+
+    // Home route: '/' or empty or unrecognized root
+    if (pathname === '/' || pathname === '' || hash === 'home' || hash === '') {
+      setSelectedArticle(null);
+      setActivePage('home');
+      updatePageMetadata(PAGE_SEO_CONFIG.home);
+      return;
+    }
+
+    // Default fallback for unknown routes: 404
     setSelectedArticle(null);
-    setActivePage('home');
-    updatePageMetadata(PAGE_SEO_CONFIG.home);
+    setActivePage('404');
+    updatePageMetadata(PAGE_SEO_CONFIG['404']);
   };
 
   // Listen to popstate (browser back/forward) and hashchange
@@ -153,6 +176,7 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
     if (page === 'articles') path = '/articles';
     else if (page === 'about') path = '/about';
     else if (page === 'contact') path = '/contact';
+    else if (page === '404') path = '/404';
 
     if (window.location.pathname !== path) {
       window.history.pushState(null, '', path);
@@ -162,24 +186,7 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
       updatePageMetadata(PAGE_SEO_CONFIG[page]);
     }
 
-    if (page === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (page === 'articles') {
-      setTimeout(() => {
-        const el = document.getElementById('articles-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
-    } else if (page === 'about') {
-      setTimeout(() => {
-        const el = document.getElementById('about-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
-    } else if (page === 'contact') {
-      setTimeout(() => {
-        const el = document.getElementById('contact-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Navigate to individual article with unique URL: /articles/:slug
@@ -201,10 +208,7 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
     setActivePage('articles');
     window.history.pushState(null, '', '/articles');
     updatePageMetadata(PAGE_SEO_CONFIG.articles);
-    setTimeout(() => {
-      const el = document.getElementById('articles-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenSearchFocus = () => {
@@ -214,10 +218,10 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
     setActivePage('articles');
     window.history.pushState(null, '', '/articles');
     updatePageMetadata(PAGE_SEO_CONFIG.articles);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       const el = document.getElementById('articles-section');
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
         const input = el.querySelector('input');
         if (input) input.focus();
       }
@@ -252,10 +256,112 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
             isBookmarked={bookmarkedIds.includes(selectedArticle.id)}
             onToggleBookmark={handleToggleBookmark}
           />
+        ) : activePage === 'articles' ? (
+          /* Dedicated Articles Directory Page (/articles) */
+          <div className="bg-slate-50 min-h-screen">
+            <header className="bg-white border-b border-slate-200/80 py-12 sm:py-16">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-4" aria-label="Breadcrumb">
+                  <a href="/" onClick={(e) => { e.preventDefault(); handleNavigate('home'); }} className="hover:text-indigo-600 transition-colors">Home</a>
+                  <span aria-hidden="true">/</span>
+                  <span className="text-slate-900 font-semibold" aria-current="page">Articles</span>
+                </nav>
+                <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+                  Artificial Intelligence Blog Articles
+                </h1>
+                <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl leading-relaxed">
+                  Browse our complete knowledge repository of 10 in-depth technology guides exploring everyday algorithms, education, workplace careers, clinical medicine, generative synthesis, cybersecurity, and societal ethics.
+                </p>
+              </div>
+            </header>
+
+            <ArticlesSection
+              articles={ARTICLES}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              onReadArticle={handleSelectArticle}
+              bookmarkedIds={bookmarkedIds}
+              onToggleBookmark={handleToggleBookmark}
+            />
+          </div>
+        ) : activePage === 'about' ? (
+          /* Dedicated About Page (/about) */
+          <div className="bg-white min-h-screen">
+            <header className="bg-slate-900 text-white py-12 sm:py-16">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-4" aria-label="Breadcrumb">
+                  <a href="/" onClick={(e) => { e.preventDefault(); handleNavigate('home'); }} className="hover:text-indigo-400 transition-colors">Home</a>
+                  <span aria-hidden="true">/</span>
+                  <span className="text-white font-semibold" aria-current="page">About</span>
+                </nav>
+                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+                  About AI Future Hub: Responsible AI Literacy Guide
+                </h1>
+                <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
+                  Learn about AI Future Hub’s mission to promote responsible AI literacy, demystify machine learning, and deliver ethical, evidence-based tech analysis.
+                </p>
+              </div>
+            </header>
+
+            <AboutSection onExploreArticles={() => handleNavigate('articles')} />
+          </div>
+        ) : activePage === 'contact' ? (
+          /* Dedicated Contact Page (/contact) */
+          <div className="bg-white min-h-screen">
+            <header className="bg-slate-900 text-white py-12 sm:py-16">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-4" aria-label="Breadcrumb">
+                  <a href="/" onClick={(e) => { e.preventDefault(); handleNavigate('home'); }} className="hover:text-indigo-400 transition-colors">Home</a>
+                  <span aria-hidden="true">/</span>
+                  <span className="text-white font-semibold" aria-current="page">Contact</span>
+                </nav>
+                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+                  Contact AI Future Hub | Editorial & Reader Inquiries
+                </h1>
+                <p className="mt-4 text-base sm:text-lg text-slate-300 max-w-3xl leading-relaxed">
+                  Contact the AI Future Hub editorial desk for inquiries, article feedback, topic suggestions, and technology education collaborations.
+                </p>
+              </div>
+            </header>
+
+            <ContactSection />
+          </div>
+        ) : activePage === '404' ? (
+          /* 404 Page Not Found */
+          <div className="min-h-[70vh] flex items-center justify-center bg-slate-50 px-4 py-20">
+            <div className="max-w-lg w-full text-center bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mb-6 font-mono text-2xl font-bold">
+                404
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
+                Page Not Found
+              </h1>
+              <p className="text-sm text-slate-600 mb-8 leading-relaxed">
+                The article or educational resource you requested does not exist or may have been relocated.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href="/"
+                  onClick={(e) => { e.preventDefault(); handleNavigate('home'); }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                >
+                  Return to Home
+                </a>
+                <a
+                  href="/articles"
+                  onClick={(e) => { e.preventDefault(); handleNavigate('articles'); }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                >
+                  Browse Articles
+                </a>
+              </div>
+            </div>
+          </div>
         ) : (
-          /* Homepage with all sections */
+          /* Homepage: Complete Magazine Experience */
           <>
-            {/* Hero Section */}
             <Hero
               onExploreClick={() => handleNavigate('articles')}
               searchQuery={searchQuery}
@@ -268,16 +374,12 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
               }}
               totalArticles={ARTICLES.length}
             />
-
-            {/* Featured Section: Explore the Future of AI */}
             <FeaturedArticles
               articles={ARTICLES}
               onReadArticle={handleSelectArticle}
               bookmarkedIds={bookmarkedIds}
               onToggleBookmark={handleToggleBookmark}
             />
-
-            {/* All Articles Section */}
             <ArticlesSection
               articles={ARTICLES}
               searchQuery={searchQuery}
@@ -288,11 +390,7 @@ export default function App({ initialPath, initialArticle }: AppProps = {}) {
               bookmarkedIds={bookmarkedIds}
               onToggleBookmark={handleToggleBookmark}
             />
-
-            {/* About Section */}
             <AboutSection onExploreArticles={() => handleNavigate('articles')} />
-
-            {/* Contact Section */}
             <ContactSection />
           </>
         )}
